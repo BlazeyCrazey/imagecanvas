@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="refresh" content="0; url=upload.html">
     <title>Redirecting...</title>
+    <script>
+        // Redirect while preserving query parameters
+        window.location.href = 'upload.html' + window.location.search;
+    </script>
 </head>
 <body>
     <p>Redirecting to <a href="upload.html">upload page</a>...</p>

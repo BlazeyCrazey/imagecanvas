@@ -156,50 +156,45 @@
 
         /* Minecraft Button */
         .mc-btn {
-            background: #3d3d3d;
-            border: 4px solid #000;
-            box-shadow:
-                inset 2px 2px 0 #5a5a5a,
-                inset -2px -2px 0 #2a2a2a;
+            background: url('img/button.png');
+            background-size: 100% 100%;
+            border: none;
             color: #fff;
-            padding: 10px 24px;
+            padding: 12px 28px;
             font-family: 'VT323', monospace;
             font-size: 1.3em;
             cursor: pointer;
-            transition: all 0.05s;
-            text-shadow: 2px 2px 0 #222;
+            text-shadow: 2px 2px 0 #3f3f3f;
+            image-rendering: pixelated;
         }
 
         .mc-btn:hover {
-            background: #4a4a4a;
-            box-shadow:
-                inset 2px 2px 0 #6a6a6a,
-                inset -2px -2px 0 #3a3a3a;
+            filter: brightness(1.2);
         }
 
         .mc-btn:active {
-            background: #353535;
-            box-shadow:
-                inset -2px -2px 0 #5a5a5a,
-                inset 2px 2px 0 #2a2a2a;
+            filter: brightness(0.9);
+        }
+
+        .mc-btn:disabled {
+            background: url('img/locked_button_disabled.png');
+            background-size: 100% 100%;
+            cursor: not-allowed;
+            filter: none;
         }
 
         .mc-btn-green {
-            background: #3d6;
-            box-shadow:
-                inset 2px 2px 0 #5e8,
-                inset -2px -2px 0 #2a4;
+            background: url('img/button.png');
+            background-size: 100% 100%;
+            filter: hue-rotate(90deg) saturate(1.5);
         }
 
         .mc-btn-green:hover {
-            background: #4e7;
+            filter: hue-rotate(90deg) saturate(1.5) brightness(1.2);
         }
 
         .mc-btn-green:active {
-            background: #3c5;
-            box-shadow:
-                inset -2px -2px 0 #5e8,
-                inset 2px 2px 0 #2a4;
+            filter: hue-rotate(90deg) saturate(1.5) brightness(0.9);
         }
 
         /* Preview */
@@ -383,32 +378,23 @@
 
         .checkbox-item input[type="checkbox"] {
             appearance: none;
-            width: 24px;
-            height: 24px;
-            background: #000;
-            border: 3px solid #444;
+            width: 28px;
+            height: 28px;
+            background: url('img/checkbox.png');
+            background-size: 100% 100%;
+            border: none;
             cursor: pointer;
-            position: relative;
+            image-rendering: pixelated;
         }
 
         .checkbox-item input[type="checkbox"]:checked {
-            background: #3a3;
-            border-color: #5a5;
-        }
-
-        .checkbox-item input[type="checkbox"]:checked::after {
-            content: '✓';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #fff;
-            font-size: 18px;
-            font-weight: bold;
+            background: url('img/checkbox_selected.png');
+            background-size: 100% 100%;
         }
 
         .checkbox-item input[type="checkbox"]:disabled {
             cursor: not-allowed;
+            filter: brightness(0.5);
         }
 
         .checkbox-item span {

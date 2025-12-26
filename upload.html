@@ -50,6 +50,45 @@
             font-size: 0.95em;
         }
 
+        .no-key {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .no-key-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .no-key h2 {
+            color: #f87171;
+            margin-bottom: 16px;
+        }
+
+        .no-key p {
+            color: #aaa;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .no-key code {
+            display: inline-block;
+            background: rgba(0,0,0,0.4);
+            padding: 12px 24px;
+            border-radius: 12px;
+            color: #fbbf24;
+            font-size: 1.1em;
+            font-family: 'Fira Code', 'Consolas', monospace;
+        }
+
+        .upload-area {
+            display: none;
+        }
+
+        .upload-area.active {
+            display: block;
+        }
+
         .drop-zone {
             border: 3px dashed rgba(255,255,255,0.2);
             border-radius: 20px;
@@ -252,8 +291,23 @@
             border-color: #667eea;
         }
 
+        .option-group input.error {
+            border-color: #f87171;
+        }
+
         .option-group select option {
             background: #1a1a2e;
+        }
+
+        .input-error {
+            color: #f87171;
+            font-size: 0.75em;
+            margin-top: 6px;
+            display: none;
+        }
+
+        .input-error.show {
+            display: block;
         }
 
         .checkboxes {
@@ -269,10 +323,19 @@
             cursor: pointer;
         }
 
+        .checkbox-item.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
         .checkbox-item input {
             width: 18px;
             height: 18px;
             accent-color: #667eea;
+        }
+
+        .checkbox-item input:disabled {
+            cursor: not-allowed;
         }
 
         .checkbox-item span {
@@ -319,73 +382,85 @@
         </div>
         <p class="subtitle">Upload images for your Minecraft server maps</p>
 
-        <!-- Drop Zone -->
-        <div class="drop-zone" id="dropZone">
-            <div class="drop-zone-icon">📁</div>
-            <p>Drag & drop an image here, or</p>
-            <button class="btn" type="button" onclick="document.getElementById('fileInput').click()">
-                Choose File
-            </button>
-            <input type="file" id="fileInput" accept="image/*">
+        <!-- No Key Message -->
+        <div class="no-key" id="noKey">
+            <div class="no-key-icon">🔒</div>
+            <h2>Access Key Required</h2>
+            <p>Run this command in-game to get your upload link:</p>
+            <code>/imagemap upload</code>
         </div>
 
-        <!-- Preview -->
-        <div class="preview" id="preview"></div>
-
-        <!-- Options -->
-        <div class="options">
-            <div class="option-group">
-                <label>Map Name</label>
-                <input type="text" id="mapName" placeholder="myimage" value="">
+        <!-- Upload Area (shown when key is valid) -->
+        <div class="upload-area" id="uploadArea">
+            <!-- Drop Zone -->
+            <div class="drop-zone" id="dropZone">
+                <div class="drop-zone-icon">📁</div>
+                <p>Drag & drop an image here, or</p>
+                <button class="btn" type="button" onclick="document.getElementById('fileInput').click()">
+                    Choose File
+                </button>
+                <input type="file" id="fileInput" accept="image/*">
             </div>
-            <div class="option-group">
-                <label>Size</label>
-                <select id="mapSize">
-                    <option value="1x1">1x1</option>
-                    <option value="2x2">2x2</option>
-                    <option value="3x3" selected>3x3</option>
-                    <option value="4x4">4x4</option>
-                    <option value="5x5">5x5</option>
-                    <option value="2x1">2x1</option>
-                    <option value="3x2">3x2</option>
-                    <option value="4x3">4x3</option>
-                    <option value="custom">Custom...</option>
-                </select>
+
+            <!-- Preview -->
+            <div class="preview" id="preview"></div>
+
+            <!-- Options -->
+            <div class="options">
+                <div class="option-group">
+                    <label>Map Name</label>
+                    <input type="text" id="mapName" placeholder="myimage" value="">
+                    <p class="input-error" id="nameError">This name is already used!</p>
+                </div>
+                <div class="option-group">
+                    <label>Size</label>
+                    <select id="mapSize">
+                        <option value="1x1">1x1</option>
+                        <option value="2x2">2x2</option>
+                        <option value="3x3" selected>3x3</option>
+                        <option value="4x4">4x4</option>
+                        <option value="5x5">5x5</option>
+                        <option value="2x1">2x1</option>
+                        <option value="3x2">3x2</option>
+                        <option value="4x3">4x3</option>
+                        <option value="custom">Custom...</option>
+                    </select>
+                </div>
             </div>
-        </div>
 
-        <div class="option-group" id="customSizeGroup" style="display:none; margin-bottom: 20px;">
-            <label>Custom Size (WxH)</label>
-            <input type="text" id="customSize" placeholder="5x3" pattern="[0-9]+x[0-9]+">
-        </div>
-
-        <div class="checkboxes">
-            <label class="checkbox-item">
-                <input type="checkbox" id="autoPlace" checked>
-                <span>-auto (single map, auto-fill frames)</span>
-            </label>
-            <label class="checkbox-item">
-                <input type="checkbox" id="hdMode">
-                <span>-HD (better quality)</span>
-            </label>
-        </div>
-
-        <!-- Progress -->
-        <div class="progress" id="progress">
-            <p class="progress-text" id="progressText">Uploading...</p>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
+            <div class="option-group" id="customSizeGroup" style="display:none; margin-bottom: 20px;">
+                <label>Custom Size (WxH)</label>
+                <input type="text" id="customSize" placeholder="5x3" pattern="[0-9]+x[0-9]+">
             </div>
-        </div>
 
-        <!-- Result -->
-        <div class="result" id="result">
-            <h3><span id="resultIcon">✅</span> <span id="resultTitle">Upload Complete!</span></h3>
-            <p class="result-label">Copy this command and paste it in-game:</p>
-            <code id="resultCode"></code>
-            <div class="result-buttons">
-                <button class="btn" onclick="copyCommand()">📋 Copy Command</button>
-                <button class="btn btn-secondary" onclick="resetUpload()">↩️ Upload Another</button>
+            <div class="checkboxes">
+                <label class="checkbox-item" id="autoPlaceLabel">
+                    <input type="checkbox" id="autoPlace" checked>
+                    <span>-auto (single map, auto-fill frames)</span>
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" id="hdMode">
+                    <span>-HD (better quality)</span>
+                </label>
+            </div>
+
+            <!-- Progress -->
+            <div class="progress" id="progress">
+                <p class="progress-text" id="progressText">Uploading...</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <!-- Result -->
+            <div class="result" id="result">
+                <h3><span id="resultIcon">✅</span> <span id="resultTitle">Upload Complete!</span></h3>
+                <p class="result-label">Copy this command and paste it in-game:</p>
+                <code id="resultCode"></code>
+                <div class="result-buttons">
+                    <button class="btn" onclick="copyCommand()">📋 Copy Command</button>
+                    <button class="btn btn-secondary" onclick="resetUpload()">↩️ Upload Another</button>
+                </div>
             </div>
         </div>
 
@@ -395,14 +470,64 @@
     </div>
 
     <script>
-        // API Key - embedded for convenience
+        // Secret for key validation (must match plugin)
+        const SECRET = 'ImageCanvas2024SecretKey';
         const API_KEY = '2163308dbcc7a2b946f9062a03a29e28';
+
+        // Get used names from localStorage
+        function getUsedNames() {
+            try {
+                return JSON.parse(localStorage.getItem('imagecanvas_names') || '[]');
+            } catch {
+                return [];
+            }
+        }
+
+        function addUsedName(name) {
+            const names = getUsedNames();
+            if (!names.includes(name.toLowerCase())) {
+                names.push(name.toLowerCase());
+                localStorage.setItem('imagecanvas_names', JSON.stringify(names));
+            }
+        }
+
+        function isNameUsed(name) {
+            return getUsedNames().includes(name.toLowerCase());
+        }
+
+        // Simple hash function for key validation
+        async function hashKey(data) {
+            const encoder = new TextEncoder();
+            const dataBuffer = encoder.encode(data);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 16);
+        }
+
+        // Validate key from URL
+        async function validateKey() {
+            const params = new URLSearchParams(window.location.search);
+            const key = params.get('key');
+
+            if (!key) return false;
+
+            // Key format: {random}-{hash}
+            const parts = key.split('-');
+            if (parts.length !== 2) return false;
+
+            const [random, providedHash] = parts;
+            const expectedHash = await hashKey(random + SECRET);
+
+            return providedHash === expectedHash;
+        }
 
         // State
         let currentFile = null;
         let uploadedUrl = null;
 
         // Elements
+        const noKey = document.getElementById('noKey');
+        const uploadArea = document.getElementById('uploadArea');
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
         const preview = document.getElementById('preview');
@@ -412,10 +537,57 @@
         const result = document.getElementById('result');
         const mapSizeSelect = document.getElementById('mapSize');
         const customSizeGroup = document.getElementById('customSizeGroup');
+        const mapNameInput = document.getElementById('mapName');
+        const nameError = document.getElementById('nameError');
+        const autoPlaceCheckbox = document.getElementById('autoPlace');
+        const autoPlaceLabel = document.getElementById('autoPlaceLabel');
 
-        // Size dropdown
+        // Initialize
+        async function init() {
+            const valid = await validateKey();
+            if (valid) {
+                noKey.style.display = 'none';
+                uploadArea.classList.add('active');
+            } else {
+                noKey.style.display = 'block';
+                uploadArea.classList.remove('active');
+            }
+        }
+
+        // Size dropdown - handle auto checkbox
+        function updateAutoCheckbox() {
+            let size = mapSizeSelect.value;
+            if (size === 'custom') {
+                size = document.getElementById('customSize').value || '3x3';
+            }
+
+            const is1x1 = size === '1x1';
+            autoPlaceCheckbox.disabled = is1x1;
+            autoPlaceLabel.classList.toggle('disabled', is1x1);
+
+            if (is1x1) {
+                autoPlaceCheckbox.checked = false;
+            }
+        }
+
         mapSizeSelect.addEventListener('change', (e) => {
             customSizeGroup.style.display = e.target.value === 'custom' ? 'block' : 'none';
+            updateAutoCheckbox();
+            if (uploadedUrl) updateCommand();
+        });
+
+        document.getElementById('customSize').addEventListener('input', () => {
+            updateAutoCheckbox();
+            if (uploadedUrl) updateCommand();
+        });
+
+        // Name validation
+        mapNameInput.addEventListener('input', () => {
+            const name = mapNameInput.value.trim();
+            const used = isNameUsed(name);
+            mapNameInput.classList.toggle('error', used && name.length > 0);
+            nameError.classList.toggle('show', used && name.length > 0);
+            if (uploadedUrl) updateCommand();
         });
 
         // Drag and drop
@@ -461,10 +633,18 @@
             reader.readAsDataURL(file);
 
             // Auto-generate name from filename
-            const nameInput = document.getElementById('mapName');
-            if (!nameInput.value) {
-                const baseName = file.name.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-                nameInput.value = baseName.substring(0, 16) || 'image';
+            if (!mapNameInput.value) {
+                let baseName = file.name.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+                baseName = baseName.substring(0, 16) || 'image';
+
+                // Make unique if already used
+                let finalName = baseName;
+                let counter = 1;
+                while (isNameUsed(finalName)) {
+                    finalName = baseName + counter;
+                    counter++;
+                }
+                mapNameInput.value = finalName;
             }
 
             // Upload
@@ -532,6 +712,9 @@
             document.getElementById('resultTitle').textContent = success ? 'Upload Complete!' : 'Upload Failed';
 
             if (success) {
+                // Save the name as used
+                const name = mapNameInput.value.trim() || 'myimage';
+                addUsedName(name);
                 updateCommand();
             } else {
                 document.getElementById('resultCode').textContent = errorMessage;
@@ -539,12 +722,12 @@
         }
 
         function updateCommand() {
-            const name = document.getElementById('mapName').value || 'myimage';
+            const name = mapNameInput.value.trim() || 'myimage';
             let size = mapSizeSelect.value;
             if (size === 'custom') {
                 size = document.getElementById('customSize').value || '3x3';
             }
-            const auto = document.getElementById('autoPlace').checked ? ' -auto' : '';
+            const auto = autoPlaceCheckbox.checked && !autoPlaceCheckbox.disabled ? ' -auto' : '';
             const hd = document.getElementById('hdMode').checked ? ' -HD' : '';
 
             const command = `/imagemap create ${name} ${uploadedUrl} ${size}${auto}${hd}`;
@@ -552,15 +735,6 @@
         }
 
         // Update command when options change
-        document.getElementById('mapName').addEventListener('input', () => {
-            if (uploadedUrl) updateCommand();
-        });
-        mapSizeSelect.addEventListener('change', () => {
-            if (uploadedUrl) updateCommand();
-        });
-        document.getElementById('customSize').addEventListener('input', () => {
-            if (uploadedUrl) updateCommand();
-        });
         document.getElementById('autoPlace').addEventListener('change', () => {
             if (uploadedUrl) updateCommand();
         });
@@ -585,9 +759,15 @@
             uploadedUrl = null;
             preview.innerHTML = '';
             result.style.display = 'none';
-            document.getElementById('mapName').value = '';
+            mapNameInput.value = '';
+            mapNameInput.classList.remove('error');
+            nameError.classList.remove('show');
             fileInput.value = '';
         }
+
+        // Initialize on load
+        init();
+        updateAutoCheckbox();
     </script>
 </body>
 </html>

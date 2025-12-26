@@ -18,10 +18,6 @@
         body {
             font-family: 'VT323', monospace;
             background: #2b2b2b;
-            background-image:
-                linear-gradient(rgba(0,0,0,0.3) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0,0,0,0.3) 1px, transparent 1px);
-            background-size: 4px 4px;
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -29,11 +25,45 @@
             padding: 20px;
             color: #fff;
             font-size: 18px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background-image:
+                linear-gradient(rgba(0,0,0,0.3) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.3) 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+
+        .grid-cell {
+            position: fixed;
+            width: 32px;
+            height: 32px;
+            background: rgba(60, 120, 255, 0.4);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 1.5s ease-out;
+            z-index: 1;
+        }
+
+        .grid-cell.active {
+            opacity: 1;
+            transition: opacity 0s;
         }
 
         .container {
             background: #1a1a1a;
             border: 4px solid #000;
+            position: relative;
+            z-index: 10;
             box-shadow:
                 inset 2px 2px 0 #3a3a3a,
                 inset -2px -2px 0 #0a0a0a,
@@ -426,6 +456,7 @@
     </style>
 </head>
 <body>
+    <div class="grid-bg"></div>
     <div class="container">
         <div class="title">
             <h1>ImageCanvas</h1>
@@ -762,6 +793,79 @@
 
         init();
         updateAutoCheckbox();
+
+        // Interactive grid background
+        const GRID_SIZE = 32;
+        const gridCells = new Map();
+
+        function getGridKey(x, y) {
+            return `${x},${y}`;
+        }
+
+        function createGridCell(gridX, gridY) {
+            const cell = document.createElement('div');
+            cell.className = 'grid-cell';
+            cell.style.left = (gridX * GRID_SIZE) + 'px';
+            cell.style.top = (gridY * GRID_SIZE) + 'px';
+            document.body.appendChild(cell);
+            return cell;
+        }
+
+        function handleMouseMove(e) {
+            const gridX = Math.floor(e.clientX / GRID_SIZE);
+            const gridY = Math.floor(e.clientY / GRID_SIZE);
+            const key = getGridKey(gridX, gridY);
+
+            if (!gridCells.has(key)) {
+                const cell = createGridCell(gridX, gridY);
+                gridCells.set(key, { element: cell, timeout: null });
+            }
+
+            const cellData = gridCells.get(key);
+            cellData.element.classList.add('active');
+
+            if (cellData.timeout) {
+                clearTimeout(cellData.timeout);
+            }
+        }
+
+        function handleMouseOut(gridX, gridY) {
+            const key = getGridKey(gridX, gridY);
+            if (gridCells.has(key)) {
+                const cellData = gridCells.get(key);
+                cellData.element.classList.remove('active');
+
+                cellData.timeout = setTimeout(() => {
+                    cellData.element.remove();
+                    gridCells.delete(key);
+                }, 1600);
+            }
+        }
+
+        let lastGridX = -1, lastGridY = -1;
+
+        document.addEventListener('mousemove', (e) => {
+            const gridX = Math.floor(e.clientX / GRID_SIZE);
+            const gridY = Math.floor(e.clientY / GRID_SIZE);
+
+            if (gridX !== lastGridX || gridY !== lastGridY) {
+                if (lastGridX !== -1) {
+                    handleMouseOut(lastGridX, lastGridY);
+                }
+                lastGridX = gridX;
+                lastGridY = gridY;
+            }
+
+            handleMouseMove(e);
+        });
+
+        document.addEventListener('mouseleave', () => {
+            if (lastGridX !== -1) {
+                handleMouseOut(lastGridX, lastGridY);
+                lastGridX = -1;
+                lastGridY = -1;
+            }
+        });
     </script>
 </body>
 </html>
